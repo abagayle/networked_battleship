@@ -14,6 +14,10 @@ clients = []
 #global variables for commands 
 welcome_message = "\nWelcome to the chat! Type list() to see who is online! Reference the README for other commands."
 
+
+def startBattleship(client_initiate, client_receiver)
+
+
 # server input handler - handles commands given through the server command line. Will be own thread.
 # Parameters: serverSocket - the socket connection used for the server itself
 # No returns - just prints and changes global variables or closes the server
@@ -53,6 +57,8 @@ def serverInputHandler(serverSocket):
 # No returns - just prints and sends over connections or closes a connection
 def clientManager(connectionSocket, client_num):
 	
+	battleships = []
+	hits = []
 
 	try:
 		#recieves a message (the clients name) from the client and decodes it
@@ -96,6 +102,41 @@ def clientManager(connectionSocket, client_num):
 					if clients[i][2] == 0:
 						send_list = "Name: %s IP: %s Port: %s"%(clients[i][1],clients[i][3],serverPort)
 						clients[client_num][0].send(send_list.encode())	
+			elif "battleship(" in message:
+				name_of_player = messsge.split('battleship(')
+				name_of_player = name_of_player[1].split(')')
+				name_of_player = name_of_player[0]
+				
+				player_num = -1
+				
+				#find player with that name in client list
+				for i in range(0, len(clients)):
+					if clients[i][1] == name_of_player:
+						player_num = i
+			
+				if player_num != -1:
+					startBattleship(client_num, player_num)
+				else:
+					no_player = "There is no player online by the name of " + name_of_player
+					print(no_player)
+					clients[i][0].send(no_player.encode())
+			elif "target(" in message:
+				coordinates = message.split('target(')
+				coordinates = coordinates[1].split(')')
+				coordinates = coordinates[0]
+				
+				if "," in coordinates:	
+					num1 = coordinates.split(',')[0]
+					num2 = coordinates[1]
+				
+				else:
+					wrong = "Wrong formate for coordinates"
+					print(wrong)
+					clients[i][0].send(wrong.encode())
+				
+				
+				
+				
 			else:
 				for i in range(0, len(clients)):
 					if clients[i][2] == 0 and client_num != i:
@@ -103,7 +144,7 @@ def clientManager(connectionSocket, client_num):
 				#if they close their connection, then client breaks out of loop and closes connection socket and exits
 				if message == "close()":
 					clients[client_num][2]=-1
-					print(clients[client_num][1], " has left the chat.")
+					print(clients[client_num], " has left the chat.")
 					break
 					
 		connectionSocket.close()
