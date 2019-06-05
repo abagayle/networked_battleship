@@ -22,12 +22,9 @@ class Player():
     width = height = 600
 
     #defines the self object with the variables
-    def __init__(self, startx, starty, color=GRAY):
-        self.x = startx
-        self.y = starty
+    def __init__(self, color=GRAY):
         self.gridShips = []
         self.gridHits = []
-        self.velocity = 2
         self.color = color
         
         #initializes the grid columns and rows
@@ -58,7 +55,7 @@ class Game:
         self.net = Network()
         self.width = w
         self.height = h
-        self.player = Player(50, 50)
+        self.player = Player()
         self.canvas = Canvas(self.width, self.height, "Battleship")
         self.stage = "set"
         self.win_flag = None
